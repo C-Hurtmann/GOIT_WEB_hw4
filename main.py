@@ -1,9 +1,11 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse
+from mimetypes import guess_type
+from pathlib import Path
 
 
 class HTTPHandler(BaseHTTPRequestHandler):
-    project_map = {'#': 'front-init/index.html',
+    project_map = {'/': 'front-init/index.html',
                    '/message.html': 'front-init/message.html'}
     
     def do_GET(self):
@@ -11,7 +13,10 @@ class HTTPHandler(BaseHTTPRequestHandler):
         try:
             self.send_html_file(self.project_map[location.path])
         except KeyError:
-            self.send_html_file('front-init/error.html')
+            if Path('front-init').joinpath(location[1:]).exists():
+                self.send_static()
+            else:
+                self.send_html_file('error.html', 404)
         
     def send_html_file(self, filename, status=200):
         self.send_response(status)
@@ -19,7 +24,17 @@ class HTTPHandler(BaseHTTPRequestHandler):
         self.end_headers()
         with open(filename, 'rb') as fd:
             self.wfile.write(fd.read())
-
+    
+    def send_static(self):
+        self.send_response(200)
+        mime = guess_type(self.path)
+        if mime:
+            self.send_header('Content-type', mime[0])
+        else:
+            self.send_header('Content-type', 'text/plain')
+        self.end_headers()
+        with open(f'.{self.path}', 'rb') as fd:
+            self.wfile.write(fd.read())
             
 def run():
     server_address = ('', 3000)
