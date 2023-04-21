@@ -1,49 +1,29 @@
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from urllib.parse import urlparse
-from mimetypes import guess_type
-from pathlib import Path
+from http.server import SimpleHTTPRequestHandler
+import socketserver
+import urllib
 
 
-class HTTPHandler(BaseHTTPRequestHandler):
-    project_map = {'/': 'front-init/index.html',
-                   '/message.html': 'front-init/message.html'}
+DIRECTORY = 'front-init'
+
+
+class Handler(SimpleHTTPRequestHandler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(directory=DIRECTORY, *args, **kwargs)
     
-    def do_GET(self):
-        location = urlparse(self.path)
-        try:
-            self.send_html_file(self.project_map[location.path])
-        except KeyError:
-            if Path('front-init').joinpath(location[1:]).exists():
-                self.send_static()
-            else:
-                self.send_html_file('error.html', 404)
+    def do_POST(self):
+        data = self.rfile.read(int(self.headers['Content-length']))
+        data_parse = urllib.parse.unquote_plus(data.decode())
+        data_dict = {key: value for key, value in [i.split('=') for i in data_parse.split('&')]}
+        print(data_dict)
         
-    def send_html_file(self, filename, status=200):
-        self.send_response(status)
-        self.send_header('Content-type', 'text/html')
+        self.send_response(302)
+        self.send_header('Location', '/')
         self.end_headers()
-        with open(filename, 'rb') as fd:
-            self.wfile.write(fd.read())
-    
-    def send_static(self):
-        self.send_response(200)
-        mime = guess_type(self.path)
-        if mime:
-            self.send_header('Content-type', mime[0])
-        else:
-            self.send_header('Content-type', 'text/plain')
-        self.end_headers()
-        with open(f'.{self.path}', 'rb') as fd:
-            self.wfile.write(fd.read())
-            
-def run():
-    server_address = ('', 3000)
-    http = HTTPServer(server_address, HTTPHandler)
-    try:
-        http.serve_forever()
-    except KeyboardInterrupt:
-        http.server_close()
 
+
+def run_server(port, handler=Handler):
+    with socketserver.UDPServer(("", port), handler) as httpd:
+        httpd.serve_forever()
 
 if __name__ == '__main__':
-    run()
+    run_server(3000)
