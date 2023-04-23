@@ -5,6 +5,7 @@ import socketserver
 import urllib
 from threading import Thread
 import json
+import os
 
 DIRECTORY = "front-init"
 HTTP_SERVER_PORT = 3000
@@ -79,7 +80,11 @@ def main():
     http.start()
     server = Thread(target=run_socket_server, args=(SOCKET_SERVER_PORT,))
     server.start()
-
+    
+    if not os.path.exists('storage/data.json'):
+        with open('storage/data.json', 'w') as f:
+            f.write('{}')
+            f.seek(0)
 
 if __name__ == "__main__":
     main()
