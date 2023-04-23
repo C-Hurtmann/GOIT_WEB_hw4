@@ -1,9 +1,7 @@
 FROM python:3.10
 
-WORKDIR /GOIT_WEB_hw4
-
 COPY . .
 
-RUN pip install requests
+VOLUME [ "/storage" ]
 
-CMD ["python3", 'main.py']
+CMD python3 main.py
