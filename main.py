@@ -63,7 +63,11 @@ def format_data(data):
 
 
 def send_to_storage(data):
-    with open("front-init/storage/data.json", "r+") as f:
+    with open("storage/data.json", "r+") as f:
+        if not f.read():
+            f.write('{}')
+
+    with open("storage/data.json", "r+") as f:
         storage_data = json.load(f)
         storage_data.update(data)
         f.seek(0)
