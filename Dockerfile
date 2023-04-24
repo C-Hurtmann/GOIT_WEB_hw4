@@ -1,11 +1,13 @@
-FROM python:3.10-slim-buster
+FROM python:3.10
 
-WORKDIR .
+ENV APP_HOME /app
+
+WORKDIR ${APP_HOME}
 
 COPY . .
 
-VOLUME ./storage
-
 EXPOSE 3000
 
-CMD ["python3", "main.p
+VOLUME /app/storage
+
+ENTRYPOINT [ "python3", "main.py" ]
