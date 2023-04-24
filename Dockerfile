@@ -1,9 +1,11 @@
-FROM python:3.10
+FROM python:3.10-slim-buster
+
+WORKDIR .
 
 COPY . .
 
-VOLUME [ "/storage" ]
+VOLUME ./storage
 
 EXPOSE 3000
 
-CMD python3 main.py
+CMD ["python3", "main.p

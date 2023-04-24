@@ -10,7 +10,7 @@ import os
 DIRECTORY = "front-init"
 HTTP_SERVER_PORT = 3000
 SOCKET_SERVER_PORT = 5000
-
+HOST = "0.0.0.0"
 
 class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
@@ -27,7 +27,7 @@ class Handler(SimpleHTTPRequestHandler):
 
 def run_http_server(port, handler=Handler):
     print("HTTP server activated")
-    with socketserver.TCPServer(("localhost", port), handler) as httpd:
+    with socketserver.TCPServer((HOST, port), handler) as httpd:
         httpd.serve_forever()
 
 
