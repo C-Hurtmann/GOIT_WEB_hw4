@@ -33,7 +33,7 @@ def run_http_server(port, handler=Handler):
 
 def run_socket_server(port):
     print("Socket server activated")
-    host = socket.gethostname()
+    host = HOST
     server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     server.bind((host, port))
     try:
@@ -49,7 +49,7 @@ def run_socket_server(port):
 
 def run_socket_client(message):
     print("Client activated")
-    host = socket.gethostname()
+    host = HOST
     client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     server = host, SOCKET_SERVER_PORT
     encoded_message = message.encode()
